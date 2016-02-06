@@ -4,7 +4,9 @@ defmodule OOP.Mixfile do
   def project do
     [app: :oop,
      version: "0.0.1",
-     elixir: "~> 1.3-dev",
+     description: "OOP in Elixir!",
+     package: package,
+     elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -28,5 +30,13 @@ defmodule OOP.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     []
+  end
+
+  defp package do
+    [
+      maintainers: ["Wojtek Mach"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/wojtekmach/oop"},
+    ]
   end
 end
