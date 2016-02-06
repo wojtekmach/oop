@@ -23,8 +23,7 @@ class Person do
   end
 end
 
-alice = Person.new
-alice.set_name("Alice")
+alice = Person.new(name: "Alice")
 alice.name # => "Alice"
 
 alice.set_date_of_birth({1970, 1, 1})

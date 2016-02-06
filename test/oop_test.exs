@@ -16,9 +16,9 @@ defmodule OOPTest do
       end
     end
 
-    alice = Person.new
-    alice.set_name("Alice")
+    alice = Person.new(name: "Alice")
     assert alice.name == "Alice"
+    assert alice.date_of_birth == nil
 
     alice.set_date_of_birth({1970, 1, 1})
     assert alice.date_of_birth == {1970, 1, 1}
@@ -74,6 +74,20 @@ defmodule OOPTest do
     assert alice.name == nil
     alice.set_name("Alice")
     assert alice.name == "Alice"
+  end
+
+  test "instantiate objects with fields" do
+    import OOP
+    class Person7 do
+      var :name
+    end
+
+    alice = Person7.new(name: "Alice")
+    assert alice.name == "Alice"
+
+    assert_raise ArgumentError, "unknown field :invalid_field", fn ->
+      Person7.new(invalid_field: "Bob")
+    end
   end
 
   test "multiple objects" do

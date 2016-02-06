@@ -1,12 +1,14 @@
 defmodule OOP do
   defmacro var(field) do
     quote do
+      @fields unquote(field)
+
       def unquote(field)() do
-        Agent.get(__MODULE__, fn data -> data[unquote(field)] end)
+        Agent.get(__MODULE__, fn data -> Map.get(data, unquote(field)) end)
       end
 
       def unquote(:"set_#{field}")(value) do
-        Agent.update(__MODULE__, fn data -> Map.merge(data, %{unquote(field) => value}) end)
+        Agent.update(__MODULE__, fn data -> Map.update!(data, unquote(field), fn _ -> value end) end)
       end
     end
   end
@@ -14,18 +16,33 @@ defmodule OOP do
   defmacro class(name, contents) do
     quote do
       defmodule unquote(name) do
-        def new do
+        def new(fields \\ []) do
           module_name = :"#{unquote(name)}#{:erlang.unique_integer}"
 
           defmodule module_name do
+             Module.register_attribute __MODULE__,
+              :fields,
+              accumulate: true, persist: false
+
             def class do
               unquote(name)
             end
 
             unquote(contents)
+
+            defstruct @fields
+
+            def __init__(fields) do
+              invalid_fields = Keyword.keys(fields) -- @fields
+              for field <- invalid_fields do
+                raise ArgumentError, "unknown field #{inspect(field)}"
+              end
+
+              {:ok, _pid} = Agent.start_link(fn -> struct(__MODULE__, fields) end, name: __MODULE__)
+            end
           end
 
-          {:ok, _pid} = Agent.start_link(fn -> %{} end, name: module_name)
+          module_name.__init__(fields)
 
           module_name
         end
