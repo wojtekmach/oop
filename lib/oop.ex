@@ -17,9 +17,9 @@ defmodule OOP do
     quote do
       defmodule unquote(name) do
         def new(fields \\ []) do
-          module_name = :"#{unquote(name)}#{:erlang.unique_integer}"
+          module = :"#{unquote(name)}#{:erlang.unique_integer}"
 
-          defmodule module_name do
+          defmodule module do
              Module.register_attribute __MODULE__,
               :fields,
               accumulate: true, persist: false
@@ -42,9 +42,8 @@ defmodule OOP do
             end
           end
 
-          module_name.__init__(fields)
-
-          module_name
+          module.__init__(fields)
+          module
         end
       end
     end
