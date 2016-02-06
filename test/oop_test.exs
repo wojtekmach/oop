@@ -1,6 +1,30 @@
 defmodule OOPTest do
   use ExUnit.Case
 
+  test "all features" do
+    import OOP
+
+    class Person do
+      var :name
+      var :date_of_birth
+
+      def age do
+        {{current_year, _, _}, _} = :calendar.local_time()
+        {year, _, _} = date_of_birth
+
+        current_year - year
+      end
+    end
+
+    alice = Person.new
+    alice.set_name("Alice")
+    assert alice.name == "Alice"
+
+    alice.set_date_of_birth({1970, 1, 1})
+    assert alice.date_of_birth == {1970, 1, 1}
+    assert alice.age == 46 # as of 2016
+  end
+
   test "define empty class" do
     import OOP
     c = class Person1 do
