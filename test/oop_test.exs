@@ -39,4 +39,16 @@ defmodule OOPTest do
     alice = Person4.new
     assert alice.name == nil
   end
+
+  test "set field values" do
+    import OOP
+    class Person5 do
+      var :name
+    end
+
+    alice = Person5.new
+    assert alice.name == nil
+    alice.set_name("Alice")
+    assert alice.name == "Alice"
+  end
 end
