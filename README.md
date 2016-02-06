@@ -12,23 +12,22 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 import OOP
 
 class Person do
-  var :name
-  var :date_of_birth
+  var :first_name
+  var :last_name
 
-  def age do
-    {{current_year, _, _}, _} = :calendar.local_time()
-    {year, _, _} = date_of_birth
-
-    current_year - year
+  def name do
+    "#{first_name} #{last_name}"
   end
 end
 
-alice = Person.new(name: "Alice")
-alice.name # => "Alice"
+john = Person.new(first_name: "John")
+john.first_name # => "John"
+john.last_name # => nil
 
-alice.set_date_of_birth({1970, 1, 1})
-alice.date_of_birth # => {1970, 1, 1}
-alice.age # => 46 # as of 2016
+john.set_last_name("Doe")
+john.last_name # => "Doe"
+
+john.name # => "John Doe"
 ```
 
 ## Installation
