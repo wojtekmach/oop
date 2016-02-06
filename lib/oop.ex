@@ -24,7 +24,7 @@ defmodule OOP do
     quote do
       defmodule unquote(name) do
         def new do
-          module_name = :"Object#{:erlang.unique_integer}"
+          module_name = :"#{unquote(name)}#{:erlang.unique_integer}"
 
           defmodule module_name do
             use GenServer
