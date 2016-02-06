@@ -6,7 +6,7 @@ defmodule OOPTest do
     c = class Person1 do
     end
 
-    assert c == Person1
+    assert c
   end
 
   test "instantiate empty object" do
@@ -16,5 +16,17 @@ defmodule OOPTest do
 
     alice = Person2.new
     assert alice.class == Person2
+  end
+
+  test "define methods on objects" do
+    import OOP
+    class Person3 do
+      def the_answer do
+        42
+      end
+    end
+
+    alice = Person3.new
+    assert alice.the_answer == 42
   end
 end

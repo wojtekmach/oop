@@ -1,13 +1,18 @@
 defmodule OOP do
-  def class(name, _body) do
-    contents =
-      quote do
+  defmacro class(name, contents) do
+    quote do
+      defmodule unquote(name) do
         def new do
-          %{class: unquote(name)}
+          defmodule Object do
+            def class do
+              unquote(name)
+            end
+
+            unquote(contents)
+          end
+          Object
         end
       end
-
-    Module.create(name, contents, Macro.Env.location(__ENV__))
-    name
+    end
   end
 end
