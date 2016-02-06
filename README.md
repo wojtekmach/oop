@@ -4,7 +4,7 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 
 [1] Actually, according to Alan Key, the inventor of OOP, "objects" is the lesser idea; the big idea is "messaging". In that sense, I can't agree more with Joe Armstrong's quote that Erlang is "possibly the only object-oriented language".
 
-[2] Please don't.
+[2] Please don't. You've been warned.
 
 ## Example
 
@@ -25,11 +25,11 @@ end
 
 alice = Person.new
 alice.set_name("Alice")
-assert alice.name == "Alice"
+alice.name # => "Alice"
 
 alice.set_date_of_birth({1970, 1, 1})
-assert alice.date_of_birth == {1970, 1, 1}
-assert alice.age == 46 # as of 2016
+alice.date_of_birth # => {1970, 1, 1}
+alice.age # => 46 # as of 2016
 ```
 
 ## Installation
