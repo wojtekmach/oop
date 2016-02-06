@@ -1,4 +1,11 @@
 defmodule OOP do
+  defmacro var(field) do
+    quote do
+      def unquote(field)() do
+      end
+    end
+  end
+
   defmacro class(name, contents) do
     quote do
       defmodule unquote(name) do
@@ -7,7 +14,6 @@ defmodule OOP do
             def class do
               unquote(name)
             end
-
             unquote(contents)
           end
           Object

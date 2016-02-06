@@ -29,4 +29,14 @@ defmodule OOPTest do
     alice = Person3.new
     assert alice.the_answer == 42
   end
+
+  test "define fields on objects" do
+    import OOP
+    class Person4 do
+      var :name
+    end
+
+    alice = Person4.new
+    assert alice.name == nil
+  end
 end
