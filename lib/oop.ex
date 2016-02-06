@@ -24,7 +24,9 @@ defmodule OOP do
     quote do
       defmodule unquote(name) do
         def new do
-          defmodule Object do
+          module_name = :"Object#{:erlang.unique_integer}"
+
+          defmodule module_name do
             use GenServer
 
             def class do
@@ -34,9 +36,9 @@ defmodule OOP do
             unquote(contents)
           end
 
-          {:ok,_} = GenServer.start_link(Object, %{}, name: Object)
+          {:ok, pid} = GenServer.start_link(module_name, %{}, name: module_name)
 
-          Object
+          module_name
         end
       end
     end

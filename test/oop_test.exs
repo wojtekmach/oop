@@ -75,4 +75,20 @@ defmodule OOPTest do
     alice.set_name("Alice")
     assert alice.name == "Alice"
   end
+
+  test "multiple objects" do
+    import OOP
+    class Person6 do
+      var :name
+    end
+
+    alice = Person6.new
+    alice.set_name("Alice")
+
+    bob = Person6.new
+    bob.set_name("Bob")
+
+    assert alice.name == "Alice"
+    assert bob.name == "Bob"
+  end
 end
