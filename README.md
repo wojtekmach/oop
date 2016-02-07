@@ -19,7 +19,7 @@ class Person do
   end
 
   def say_to(who, something) do
-    who.hear_from(__MODULE__, something)
+    who.hear_from(this, something)
   end
 
   def hear_from(who, what) do

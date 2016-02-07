@@ -26,6 +26,10 @@ defmodule OOP do
 
               {:ok, _pid} = Agent.start_link(fn -> struct(__MODULE__, fields) end, name: __MODULE__)
             end
+
+            defp this do
+              __MODULE__
+            end
           end
 
           module.__init__(fields)

@@ -76,28 +76,42 @@ defmodule OOPTest do
 
   test "instantiate objects with fields" do
     import OOP
-    class Person7 do
-      var :name
-    end
-
-    alice = Person7.new(name: "Alice")
-    assert alice.name == "Alice"
-
-    assert_raise ArgumentError, "unknown field :invalid_field", fn ->
-      Person7.new(invalid_field: "Bob")
-    end
-  end
-
-  test "multiple objects" do
-    import OOP
     class Person6 do
       var :name
     end
 
-    alice = Person6.new
+    alice = Person6.new(name: "Alice")
+    assert alice.name == "Alice"
+
+    assert_raise ArgumentError, "unknown field :invalid_field", fn ->
+      Person6.new(invalid_field: "Bob")
+    end
+  end
+
+  test "this" do
+    import OOP
+    class Person7 do
+      var :name
+
+      def shout do
+        String.upcase(this.name)
+      end
+    end
+
+    alice = Person7.new(name: "Alice")
+    assert alice.shout == "ALICE"
+  end
+
+  test "multiple objects" do
+    import OOP
+    class Person8 do
+      var :name
+    end
+
+    alice = Person8.new
     alice.set_name("Alice")
 
-    bob = Person6.new
+    bob = Person8.new
     bob.set_name("Bob")
 
     assert alice.name == "Alice"
