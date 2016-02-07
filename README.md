@@ -42,6 +42,41 @@ joe.name # => Hipster Joe
 joe.say_to(robert, "I like this OOP thing") # ** (exit) "reasons"
 ```
 
+An OOP library wouldn't be complete without inheritance:
+
+```elixir
+class Animal do
+  var :name
+end
+
+class Dog < Animal do
+  var :breed
+end
+
+snuffles = Dog.new(name: "Snuffles", breed: "Shih Tzu")
+assert snuffles.name == "Snuffles"
+assert snuffles.breed == "Shih Tzu"
+```
+
+... or multiple inheritance:
+
+```elixir
+class Human do
+  var :name
+end
+
+class Horse do
+  var :horseshoes_on?
+end
+
+class Centaur < [Human, Horse] do
+end
+
+john = Centaur.new(name: "John", horseshoes_on?: true)
+assert john.name == "John"
+assert john.horseshoes_on? == true
+```
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
