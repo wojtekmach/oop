@@ -1,7 +1,7 @@
 defmodule OOP do
   use Application
 
-  defmodule CodeServer do
+  defmodule ClassServer do
     def start_link do
       Agent.start_link(fn -> %{} end, name: __MODULE__)
     end
@@ -30,7 +30,7 @@ defmodule OOP do
   end
 
   def start(_type, _args) do
-    CodeServer.start_link
+    ClassServer.start_link
   end
 
   defmacro class(class_expr, block) do
@@ -46,11 +46,11 @@ defmodule OOP do
     end
 
     {_, _, [class_name]} = class
-    CodeServer.set(class_name, block)
+    ClassServer.set(class_name, block)
 
     superclass_blocks = Enum.map(superclasses, fn superclass ->
       {_, _, [superclass_name]} = superclass
-      CodeServer.get(superclass_name)
+      ClassServer.get(superclass_name)
     end)
 
     quote do
