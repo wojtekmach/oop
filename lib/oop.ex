@@ -15,6 +15,20 @@ defmodule OOP do
     end
   end
 
+  defmodule ObjectServer do
+    def start_link(object, fields) do
+      Agent.start_link(fn -> struct(object, fields) end, name: object)
+    end
+
+    def get(object, field) do
+      Agent.get(object, fn data -> Map.get(data, field) end)
+    end
+
+    def set(object, field, value) do
+      Agent.update(object, fn data -> Map.update!(data, field, fn _ -> value end) end)
+    end
+  end
+
   def start(_type, _args) do
     CodeServer.start_link
   end
@@ -60,7 +74,7 @@ defmodule OOP do
                 raise ArgumentError, "unknown field #{inspect(field)}"
               end
 
-              {:ok, _pid} = Agent.start_link(fn -> struct(__MODULE__, fields) end, name: __MODULE__)
+              {:ok, _pid} = ObjectServer.start_link(__MODULE__, fields)
             end
 
             def class do
@@ -84,11 +98,11 @@ defmodule OOP do
       @fields unquote(field)
 
       def unquote(field)() do
-        Agent.get(__MODULE__, fn data -> Map.get(data, unquote(field)) end)
+        ObjectServer.get(__MODULE__, unquote(field))
       end
 
       def unquote(:"set_#{field}")(value) do
-        Agent.update(__MODULE__, fn data -> Map.update!(data, unquote(field), fn _ -> value end) end)
+        ObjectServer.set(__MODULE__, unquote(field), value)
       end
     end
   end
