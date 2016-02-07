@@ -117,4 +117,19 @@ defmodule OOPTest do
     assert alice.name == "Alice"
     assert bob.name == "Bob"
   end
+
+  test "inheritance" do
+    import OOP
+    class Animal do
+      var :name
+    end
+
+    class Dog < Animal do
+      var :breed
+    end
+
+    snuffles = Dog.new(name: "Snuffles", breed: "Shih Tzu")
+    assert snuffles.name == "Snuffles"
+    assert snuffles.breed == "Shih Tzu"
+  end
 end

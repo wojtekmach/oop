@@ -1,5 +1,42 @@
 defmodule OOP do
-  defmacro class(class, block) do
+  use Application
+
+  defmodule CodeServer do
+    def start_link do
+      Agent.start_link(fn -> %{} end, name: __MODULE__)
+    end
+
+    def put(class_name, code) do
+      Agent.update(__MODULE__, fn map -> Map.put(map, class_name, code) end)
+    end
+
+    def get(class_name) do
+      Agent.get(__MODULE__, fn map -> Map.fetch!(map, class_name) end)
+    end
+  end
+
+  def start(_type, _args) do
+    CodeServer.start_link
+  end
+
+  defmacro class(class_expr, block) do
+    {class, superclass} = case class_expr do
+      {:<, _, [class, superclass]} ->
+        {class, superclass}
+
+      class ->
+        {class, nil}
+    end
+
+    {_, _, [class_name]} = class
+    CodeServer.put(class_name, block)
+
+    superclass_block = if superclass do
+      {_, _, [superclass_name]} = superclass
+      CodeServer.get(superclass_name)
+    end
+
+
     quote do
       defmodule unquote(class) do
         def new(fields \\ []) do
@@ -11,6 +48,7 @@ defmodule OOP do
               accumulate: true, persist: false
 
             unquote(block)
+            unquote(superclass_block)
 
             defstruct @fields
 
