@@ -12,22 +12,34 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 import OOP
 
 class Person do
-  var :first_name
-  var :last_name
+  var :name
 
-  def name do
-    "#{first_name} #{last_name}"
+  def say_hello_to(who) do
+    say_to(who, "Hello #{who.name}")
+  end
+
+  def say_to(who, something) do
+    who.hear_from(__MODULE__, something)
+  end
+
+  def hear_from(who, what) do
+    IO.puts("#{who.name}: #{what}")
   end
 end
 
-john = Person.new(first_name: "John")
-john.first_name # => "John"
-john.last_name # => nil
+joe = Person.new(name: "Joe")
+mike = Person.new(name: "Mike")
+robert = Person.new(name: "Robert")
 
-john.set_last_name("Doe")
-john.last_name # => "Doe"
+joe.say_hello_to(mike)    # Joe: Hello Mike
+mike.say_hello_to(joe)    # Mike: Hello Joe
+mike.say_hello_to(robert) # Mike: Hello Robert
+robert.say_hello_to(mike) # Robert: Hello Mike
 
-john.name # => "John Doe"
+joe.set_name("Hipster Joe")
+joe.name # => Hipster Joe
+
+joe.say_to(robert, "I like this OOP thing") # ** (exit) "reasons"
 ```
 
 ## Installation
