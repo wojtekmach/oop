@@ -35,8 +35,8 @@ defmodule OOP do
 
   defmacro class(class_expr, block) do
     {class, superclasses} = case class_expr do
-      {:<, _, [class, [h | t]]} ->
-        {class, [h] ++ t}
+      {:<, _, [class, superclasses]} when is_list(superclasses) ->
+        {class, superclasses}
 
       {:<, _, [class, superclass]} ->
         {class, [superclass]}
