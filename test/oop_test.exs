@@ -132,4 +132,22 @@ defmodule OOPTest do
     assert snuffles.name == "Snuffles"
     assert snuffles.breed == "Shih Tzu"
   end
+
+  test "multiple inheritance" do
+    import OOP
+    class Human do
+      var :name
+    end
+
+    class Horse do
+      var :horseshoes_on?
+    end
+
+    class Centaur < [Human, Horse] do
+    end
+
+    john = Centaur.new(name: "John", horseshoes_on?: true)
+    assert john.name == "John"
+    assert john.horseshoes_on? == true
+  end
 end

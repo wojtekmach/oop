@@ -6,12 +6,12 @@ defmodule OOP do
       Agent.start_link(fn -> %{} end, name: __MODULE__)
     end
 
-    def put(class_name, code) do
-      Agent.update(__MODULE__, fn map -> Map.put(map, class_name, code) end)
-    end
-
     def get(class_name) do
       Agent.get(__MODULE__, fn map -> Map.fetch!(map, class_name) end)
+    end
+
+    def set(class_name, code) do
+      Agent.update(__MODULE__, fn map -> Map.put(map, class_name, code) end)
     end
   end
 
@@ -20,22 +20,24 @@ defmodule OOP do
   end
 
   defmacro class(class_expr, block) do
-    {class, superclass} = case class_expr do
+    {class, superclasses} = case class_expr do
+      {:<, _, [class, [h | t]]} ->
+        {class, [h] ++ t}
+
       {:<, _, [class, superclass]} ->
-        {class, superclass}
+        {class, [superclass]}
 
       class ->
-        {class, nil}
+        {class, []}
     end
 
     {_, _, [class_name]} = class
-    CodeServer.put(class_name, block)
+    CodeServer.set(class_name, block)
 
-    superclass_block = if superclass do
+    superclass_blocks = Enum.map(superclasses, fn superclass ->
       {_, _, [superclass_name]} = superclass
       CodeServer.get(superclass_name)
-    end
-
+    end)
 
     quote do
       defmodule unquote(class) do
@@ -48,7 +50,7 @@ defmodule OOP do
               accumulate: true, persist: false
 
             unquote(block)
-            unquote(superclass_block)
+            unquote(superclass_blocks)
 
             defstruct @fields
 
