@@ -1,20 +1,16 @@
 defmodule OOP do
-  defmacro class(name, contents) do
+  defmacro class(class, block) do
     quote do
-      defmodule unquote(name) do
+      defmodule unquote(class) do
         def new(fields \\ []) do
-          module = :"#{unquote(name)}#{:erlang.unique_integer}"
+          object = :"#{unquote(class)}#{:erlang.unique_integer}"
 
-          defmodule module do
+          defmodule object do
              Module.register_attribute __MODULE__,
               :fields,
               accumulate: true, persist: false
 
-            def class do
-              unquote(name)
-            end
-
-            unquote(contents)
+            unquote(block)
 
             defstruct @fields
 
@@ -27,13 +23,17 @@ defmodule OOP do
               {:ok, _pid} = Agent.start_link(fn -> struct(__MODULE__, fields) end, name: __MODULE__)
             end
 
+            def class do
+              unquote(class)
+            end
+
             defp this do
               __MODULE__
             end
           end
 
-          module.__init__(fields)
-          module
+          object.__init__(fields)
+          object
         end
       end
     end
