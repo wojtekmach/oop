@@ -21,11 +21,11 @@ defmodule OOP do
     end
 
     def get(object, field) do
-      Agent.get(object, fn data -> Map.get(data, field) end)
+      Agent.get(object, fn data -> Map.fetch!(data, field) end)
     end
 
     def set(object, field, value) do
-      Agent.update(object, fn data -> Map.update!(data, field, fn _ -> value end) end)
+      Agent.update(object, fn data -> %{data | field => value} end)
     end
   end
 
