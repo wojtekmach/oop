@@ -54,8 +54,8 @@ class Dog < Animal do
 end
 
 snuffles = Dog.new(name: "Snuffles", breed: "Shih Tzu")
-assert snuffles.name == "Snuffles"
-assert snuffles.breed == "Shih Tzu"
+snuffles.name # => "Snuffles"
+snuffles.breed # => "Shih Tzu"
 ```
 
 ... or multiple inheritance:
@@ -73,8 +73,8 @@ class Centaur < [Human, Horse] do
 end
 
 john = Centaur.new(name: "John", horseshoes_on?: true)
-assert john.name == "John"
-assert john.horseshoes_on? == true
+john.name # => "John"
+john.horseshoes_on? # => true
 ```
 
 ## Installation
