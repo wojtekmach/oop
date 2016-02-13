@@ -150,4 +150,45 @@ defmodule OOPTest do
     assert john.name == "John"
     assert john.horseshoes_on? == true
   end
+
+  test "returns fields defined on a class" do
+    import OOP
+    class Empty do
+    end
+
+    class JustMethod do
+      def foo do
+      end
+    end
+
+    class JustMethods do
+      def foo do
+      end
+
+      def bar do
+      end
+    end
+
+    class JustField do
+      var :foo
+    end
+
+    class JustFields do
+      var :foo
+      var :bar
+    end
+
+    class FieldsAndMethods do
+      var :foo
+
+      def bar do
+      end
+    end
+
+    assert Empty.fields == []
+    assert JustMethod.fields == []
+    assert JustMethods.fields == []
+    assert JustFields.fields == [:foo, :bar]
+    assert FieldsAndMethods.fields == [:foo]
+  end
 end

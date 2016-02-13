@@ -53,8 +53,18 @@ defmodule OOP do
       ClassServer.get(superclass_name)
     end)
 
+    create_class(class, block, superclass_blocks)
+  end
+
+  defp create_class(class, block, superclass_blocks) do
+    fields = extract_fields(block)
+
     quote do
       defmodule unquote(class) do
+        def fields do
+          unquote(fields)
+        end
+
         def new(fields \\ []) do
           object = :"#{unquote(class)}#{:erlang.unique_integer}"
 
@@ -92,6 +102,13 @@ defmodule OOP do
       end
     end
   end
+
+  defp extract_fields([do: nil]), do: []
+  defp extract_fields([do: {:def, _, _}]), do: []
+  defp extract_fields([do: {:__block__, _, declarations}]) do
+    for {:var, _, [field]} <- declarations, do: field
+  end
+  defp extract_fields([do: {:var, _, [field]}]), do: [field]
 
   defmacro var(field) do
     quote do
