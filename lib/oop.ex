@@ -1,20 +1,4 @@
 defmodule OOP do
-  use Application
-
-  defmodule ClassServer do
-    def start_link do
-      Agent.start_link(fn -> %{} end, name: __MODULE__)
-    end
-
-    def get(class_name) do
-      Agent.get(__MODULE__, fn map -> Map.fetch!(map, class_name) end)
-    end
-
-    def set(class_name, code) do
-      Agent.update(__MODULE__, fn map -> Map.put(map, class_name, code) end)
-    end
-  end
-
   defmodule ObjectServer do
     def start_link(object, fields) do
       Agent.start_link(fn -> struct(object, fields) end, name: object)
@@ -29,10 +13,6 @@ defmodule OOP do
     end
   end
 
-  def start(_type, _args) do
-    ClassServer.start_link
-  end
-
   defmacro class(class_expr, block) do
     {class, superclasses} = case class_expr do
       {:<, _, [class, superclasses]} when is_list(superclasses) ->
@@ -45,18 +25,10 @@ defmodule OOP do
         {class, []}
     end
 
-    {_, _, [class_name]} = class
-    ClassServer.set(class_name, block)
-
-    superclass_blocks = Enum.map(superclasses, fn superclass ->
-      {_, _, [superclass_name]} = superclass
-      ClassServer.get(superclass_name)
-    end)
-
-    create_class(class, superclasses, block, superclass_blocks)
+    create_class(class, superclasses, block)
   end
 
-  defp create_class(class, superclasses, block, superclass_blocks) do
+  defp create_class(class, superclasses, block) do
     fields = extract_fields(block)
     methods = extract_methods(block)
 
@@ -72,10 +44,18 @@ defmodule OOP do
 
         def new(fields \\ []) do
           object = :"#{unquote(class)}#{:erlang.unique_integer}"
+          superclass_fields = Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
 
           defmodule object do
             unquote(block)
-            unquote(superclass_blocks)
+
+            for superclass <- unquote(superclasses) do
+              parent = superclass.new(Enum.filter(fields, fn {field, _} -> field in superclass.fields end))
+
+              for {method, arity} <- superclass.methods do
+                Code.eval_quoted(delegated_method_quoted(parent, method, arity), [], __ENV__)
+              end
+            end
 
             defstruct unquote(class).fields
 
@@ -143,5 +123,18 @@ defmodule OOP do
         ObjectServer.set(__MODULE__, unquote(field), value)
       end
     end
+  end
+
+  def delegated_method_quoted(parent, method, arity) do
+    args =
+      if arity > 0 do
+        (0..arity) |> Enum.drop(1) |> Enum.map(fn i -> {:"arg#{i}", [], OOP} end)
+      else
+        []
+      end
+
+    {:defdelegate, [context: OOP, import: Kernel],
+      [{method, [], args},
+        [to: parent]]}
   end
 end
