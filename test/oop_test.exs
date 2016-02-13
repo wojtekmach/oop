@@ -122,6 +122,10 @@ defmodule OOPTest do
     import OOP
     class Animal do
       var :name
+
+      def title(prefix) do
+        "#{prefix} #{name}"
+      end
     end
 
     class Dog < Animal do
@@ -131,6 +135,7 @@ defmodule OOPTest do
     snuffles = Dog.new(name: "Snuffles", breed: "Shih Tzu")
     assert snuffles.name == "Snuffles"
     assert snuffles.breed == "Shih Tzu"
+    assert snuffles.title("Mr.") == "Mr. Snuffles"
   end
 
   test "multiple inheritance" do
