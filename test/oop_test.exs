@@ -218,9 +218,22 @@ defmodule OOPTest do
       end
     end
 
+    class JustFields2 do
+      var :foo
+    end
+
+    class FieldsAndMethods2 do
+      var :foo
+
+      def bar(_arg1) do
+      end
+    end
+
     assert Empty2.methods == []
     assert JustMethod2.methods == [foo: 0]
     assert JustMethodWithArity2.methods == [foo: 2]
     assert JustMethodsWithArities2.methods == [foo: 0, bar: 1, baz: 2]
+    assert JustFields2.methods == [foo: 0, set_foo: 1]
+    assert FieldsAndMethods2.methods == [foo: 0, set_foo: 1, bar: 1]
   end
 end

@@ -115,11 +115,19 @@ defmodule OOP do
   defp extract_methods([do: {:def, _, [{name, _, arg_exprs}, _code]}]) do
     [{name, extract_arity(arg_exprs)}]
   end
-  defp extract_methods([do: {:var, _, _}]), do: []
+  defp extract_methods([do: {:var, _, [field]}]), do: [{field, 0}, {:"set_#{field}", 1}]
   defp extract_methods([do: {:__block__, _, declarations}]) do
-    for {:def, _, [{name, _, arg_exprs}, _code]} <- declarations do
-      {name, extract_arity(arg_exprs)}
-    end
+    methods =
+      for {:def, _, [{name, _, arg_exprs}, _code]} <- declarations do
+        {name, extract_arity(arg_exprs)}
+      end
+
+    field_methods =
+      for {:var, _, [field]} <- declarations do
+        [{field, 0}, {:"set_#{field}", 1}]
+      end
+
+    List.flatten(field_methods) ++ methods
   end
 
   defp extract_arity(nil), do: 0
