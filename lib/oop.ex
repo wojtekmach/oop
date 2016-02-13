@@ -58,11 +58,16 @@ defmodule OOP do
 
   defp create_class(class, superclasses, block, superclass_blocks) do
     fields = extract_fields(block)
+    methods = extract_methods(block)
 
     quote do
       defmodule unquote(class) do
         def fields do
           unquote(fields) ++ Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
+        end
+
+        def methods do
+          unquote(methods)
         end
 
         def new(fields \\ []) do
@@ -105,6 +110,20 @@ defmodule OOP do
     for {:var, _, [field]} <- declarations, do: field
   end
   defp extract_fields([do: {:var, _, [field]}]), do: [field]
+
+  defp extract_methods([do: nil]), do: []
+  defp extract_methods([do: {:def, _, [{name, _, arg_exprs}, _code]}]) do
+    [{name, extract_arity(arg_exprs)}]
+  end
+  defp extract_methods([do: {:var, _, _}]), do: []
+  defp extract_methods([do: {:__block__, _, declarations}]) do
+    for {:def, _, [{name, _, arg_exprs}, _code]} <- declarations do
+      {name, extract_arity(arg_exprs)}
+    end
+  end
+
+  defp extract_arity(nil), do: 0
+  defp extract_arity(exprs), do: length(exprs)
 
   defmacro var(field) do
     quote do

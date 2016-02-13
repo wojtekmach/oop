@@ -191,4 +191,36 @@ defmodule OOPTest do
     assert JustFields.fields == [:foo, :bar]
     assert FieldsAndMethods.fields == [:foo]
   end
+
+  test "returns methods defined on a class" do
+    import OOP
+    class Empty2 do
+    end
+
+    class JustMethod2 do
+      def foo do
+      end
+    end
+
+    class JustMethodWithArity2 do
+      def foo(_arg1, _arg2) do
+      end
+    end
+
+    class JustMethodsWithArities2 do
+      def foo do
+      end
+
+      def bar(_arg1) do
+      end
+
+      def baz(_arg1, _arg2) do
+      end
+    end
+
+    assert Empty2.methods == []
+    assert JustMethod2.methods == [foo: 0]
+    assert JustMethodWithArity2.methods == [foo: 2]
+    assert JustMethodsWithArities2.methods == [foo: 0, bar: 1, baz: 2]
+  end
 end
