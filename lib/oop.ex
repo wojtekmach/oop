@@ -53,33 +53,29 @@ defmodule OOP do
       ClassServer.get(superclass_name)
     end)
 
-    create_class(class, block, superclass_blocks)
+    create_class(class, superclasses, block, superclass_blocks)
   end
 
-  defp create_class(class, block, superclass_blocks) do
+  defp create_class(class, superclasses, block, superclass_blocks) do
     fields = extract_fields(block)
 
     quote do
       defmodule unquote(class) do
         def fields do
-          unquote(fields)
+          unquote(fields) ++ Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
         end
 
         def new(fields \\ []) do
           object = :"#{unquote(class)}#{:erlang.unique_integer}"
 
           defmodule object do
-             Module.register_attribute __MODULE__,
-              :fields,
-              accumulate: true, persist: false
-
             unquote(block)
             unquote(superclass_blocks)
 
-            defstruct @fields
+            defstruct unquote(class).fields
 
             def __init__(fields) do
-              invalid_fields = Keyword.keys(fields) -- @fields
+              invalid_fields = Keyword.keys(fields) -- unquote(class).fields
               for field <- invalid_fields do
                 raise ArgumentError, "unknown field #{inspect(field)}"
               end
@@ -112,8 +108,6 @@ defmodule OOP do
 
   defmacro var(field) do
     quote do
-      @fields unquote(field)
-
       def unquote(field)() do
         ObjectServer.get(__MODULE__, unquote(field))
       end
