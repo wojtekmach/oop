@@ -13,7 +13,7 @@ defmodule OOP do
     end
   end
 
-  defmacro class(class_expr, block) do
+  defmacro class(class_expr, block, opts \\ []) do
     {class, superclasses} = case class_expr do
       {:<, _, [class, superclasses]} when is_list(superclasses) ->
         {class, superclasses}
@@ -25,12 +25,21 @@ defmodule OOP do
         {class, []}
     end
 
-    create_class(class, superclasses, block)
+    create_class(class, superclasses, block, opts)
   end
 
-  defp create_class(class, superclasses, block) do
+  defmacro abstract(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), abstract: true)
+    end
+  end
+
+  defp create_class(class, superclasses, block, opts) do
     fields = extract_fields(block)
     methods = extract_methods(block)
+    abstract? = Keyword.get(opts, :abstract, false)
 
     quote do
       defmodule unquote(class) do
@@ -42,7 +51,11 @@ defmodule OOP do
           unquote(methods)
         end
 
-        def new(fields \\ []) do
+        def new(fields \\ [], descendant? \\ false) do
+          if !descendant? && unquote(abstract?) do
+            raise "cannot instantiate abstract class"
+          end
+
           object = :"#{unquote(class)}#{:erlang.unique_integer}"
           superclass_fields = Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
 
@@ -50,7 +63,7 @@ defmodule OOP do
             unquote(block)
 
             for superclass <- unquote(superclasses) do
-              parent = superclass.new(Enum.filter(fields, fn {field, _} -> field in superclass.fields end))
+              parent = superclass.new(Enum.filter(fields, fn {field, _} -> field in superclass.fields end), true)
 
               for {method, arity} <- superclass.methods do
                 Code.eval_quoted(delegated_method_quoted(parent, method, arity), [], __ENV__)

@@ -156,6 +156,22 @@ defmodule OOPTest do
     assert john.horseshoes_on? == true
   end
 
+  test "define abstract class" do
+    import OOP
+    abstract class ActiveRecord.Base do
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+      ActiveRecord.Base.new
+    end
+
+    class Post < ActiveRecord.Base do
+      var :title
+    end
+
+    assert Post.new(title: "Post 1").title == "Post 1"
+  end
+
   test "returns fields defined on a class" do
     import OOP
     class Empty do
