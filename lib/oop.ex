@@ -121,9 +121,10 @@ defmodule OOP do
   defp extract_fields([do: nil]), do: []
   defp extract_fields([do: {:def, _, _}]), do: []
   defp extract_fields([do: {:__block__, _, declarations}]) do
-    for {:var, _, [field]} <- declarations, do: field
+    for {var, _, [field]} <- declarations, var in [:var, :private_var], do: field
   end
   defp extract_fields([do: {:var, _, [field]}]), do: [field]
+  defp extract_fields([do: {:private_var, _, [field]}]), do: [field]
 
   defp extract_methods([do: nil]), do: []
   defp extract_methods([do: {:def, _, [{name, _, arg_exprs}, _code]}]) do
@@ -147,14 +148,32 @@ defmodule OOP do
   defp extract_arity(nil), do: 0
   defp extract_arity(exprs), do: length(exprs)
 
-  defmacro var(field) do
+  defmacro private_var(field) do
     quote do
-      def unquote(field)() do
-        ObjectServer.get(__MODULE__, unquote(field))
-      end
+      var(unquote(field), private: true)
+    end
+  end
 
-      def unquote(:"set_#{field}")(value) do
-        ObjectServer.set(__MODULE__, unquote(field), value)
+  defmacro var(field, opts \\ []) do
+    private? = Keyword.get(opts, :private, false)
+
+    quote do
+      if unquote(private?) do
+        defp unquote(field)() do
+          ObjectServer.get(__MODULE__, unquote(field))
+        end
+
+        defp unquote(:"set_#{field}")(value) do
+          ObjectServer.set(__MODULE__, unquote(field), value)
+        end
+      else
+        def unquote(field)() do
+          ObjectServer.get(__MODULE__, unquote(field))
+        end
+
+        def unquote(:"set_#{field}")(value) do
+          ObjectServer.set(__MODULE__, unquote(field), value)
+        end
       end
     end
   end

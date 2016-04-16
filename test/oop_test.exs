@@ -209,6 +209,24 @@ defmodule OOPTest do
     end
   end
 
+  test "define private fields" do
+    class AppleInc do
+      private_var :registered_devices
+
+      def registered_devices_count do
+        length(registered_devices)
+      end
+    end
+
+    apple = AppleInc.new(registered_devices: ["Alice's iPhone", "Bob's iPhone"])
+
+    assert_raise UndefinedFunctionError, fn ->
+      apple.registered_devices
+    end
+
+    assert apple.registered_devices_count == 2
+  end
+
   test "returns fields defined on a class" do
     class Empty do
     end
