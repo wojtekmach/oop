@@ -20,69 +20,76 @@ defmodule OOPTest do
     assert john.last_name == "Doe"
 
     assert john.name == "John Doe"
+    purge Person
   end
 
   test "define empty class" do
-    c = class Person1 do
+    c = class Person do
     end
 
     assert c
+    purge Person
   end
 
   test "instantiate empty object" do
-    class Person2 do
+    class Person do
     end
 
-    alice = Person2.new
-    assert alice.class == Person2
+    alice = Person.new
+    assert alice.class == Person
+    purge Person
   end
 
   test "define methods on objects" do
-    class Person3 do
+    class Person do
       def the_answer do
         42
       end
     end
 
-    alice = Person3.new
+    alice = Person.new
     assert alice.the_answer == 42
+    purge Person
   end
 
   test "define fields on objects" do
-    class Person4 do
+    class Person do
       var :name
     end
 
-    alice = Person4.new
+    alice = Person.new
     assert alice.name == nil
+    purge Person
   end
 
   test "set field values" do
-    class Person5 do
+    class Person do
       var :name
     end
 
-    alice = Person5.new
+    alice = Person.new
     assert alice.name == nil
     alice.set_name("Alice")
     assert alice.name == "Alice"
+    purge Person
   end
 
   test "instantiate objects with fields" do
-    class Person6 do
+    class Person do
       var :name
     end
 
-    alice = Person6.new(name: "Alice")
+    alice = Person.new(name: "Alice")
     assert alice.name == "Alice"
 
     assert_raise ArgumentError, "unknown field :invalid_field", fn ->
-      Person6.new(invalid_field: "Bob")
+      Person.new(invalid_field: "Bob")
     end
+    purge Person
   end
 
   test "this" do
-    class Person7 do
+    class Person do
       var :name
 
       def shout do
@@ -90,23 +97,25 @@ defmodule OOPTest do
       end
     end
 
-    alice = Person7.new(name: "Alice")
+    alice = Person.new(name: "Alice")
     assert alice.shout == "ALICE"
+    purge Person
   end
 
   test "multiple objects" do
-    class Person8 do
+    class Person do
       var :name
     end
 
-    alice = Person8.new
+    alice = Person.new
     alice.set_name("Alice")
 
-    bob = Person8.new
+    bob = Person.new
     bob.set_name("Bob")
 
     assert alice.name == "Alice"
     assert bob.name == "Bob"
+    purge Person
   end
 
   test "inheritance" do
@@ -126,6 +135,8 @@ defmodule OOPTest do
     assert snuffles.name == "Snuffles"
     assert snuffles.breed == "Shih Tzu"
     assert snuffles.title("Mr.") == "Mr. Snuffles"
+
+    purge [Animal, Dog]
   end
 
   test "multiple inheritance" do
@@ -143,6 +154,8 @@ defmodule OOPTest do
     john = Centaur.new(name: "John", horseshoes_on?: true)
     assert john.name == "John"
     assert john.horseshoes_on? == true
+
+    purge [Human, Horse, Centaur]
   end
 
   test "define abstract class" do
@@ -158,28 +171,30 @@ defmodule OOPTest do
     end
 
     assert Post.new(title: "Post 1").title == "Post 1"
+    purge [ActiveRecord.Base, Post]
   end
 
   test "abstract class inheriting from abstract class" do
-    abstract class ActiveRecord.Base2 do
+    abstract class ActiveRecord.Base do
     end
 
-    abstract class ApplicationRecord < ActiveRecord.Base2 do
+    abstract class ApplicationRecord < ActiveRecord.Base do
     end
 
     assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
-      ActiveRecord.Base2.new
+      ActiveRecord.Base.new
     end
 
     assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
       ApplicationRecord.new
     end
 
-    class Post2 < ApplicationRecord do
+    class Post < ApplicationRecord do
       var :title
     end
 
-    assert Post2.new(title: "Post 1").title == "Post 1"
+    assert Post.new(title: "Post 1").title == "Post 1"
+    purge [ActiveRecord.Base, ApplicationRecord, Post]
   end
 
   test "returns fields defined on a class" do
@@ -218,25 +233,28 @@ defmodule OOPTest do
     assert Empty.fields == []
     assert JustMethod.fields == []
     assert JustMethods.fields == []
+    assert JustField.fields == [:foo]
     assert JustFields.fields == [:foo, :bar]
     assert FieldsAndMethods.fields == [:foo]
+
+    purge [Empty, JustMethod, JustMethods, JustField, JustFields, FieldsAndMethods]
   end
 
   test "returns methods defined on a class" do
-    class Empty2 do
+    class Empty do
     end
 
-    class JustMethod2 do
+    class JustMethod do
       def foo do
       end
     end
 
-    class JustMethodWithArity2 do
+    class JustMethodWithArity do
       def foo(_arg1, _arg2) do
       end
     end
 
-    class JustMethodsWithArities2 do
+    class JustMethodsWithArities do
       def foo do
       end
 
@@ -247,22 +265,32 @@ defmodule OOPTest do
       end
     end
 
-    class JustFields2 do
+    class JustFields do
       var :foo
     end
 
-    class FieldsAndMethods2 do
+    class FieldsAndMethods do
       var :foo
 
       def bar(_arg1) do
       end
     end
 
-    assert Empty2.methods == []
-    assert JustMethod2.methods == [foo: 0]
-    assert JustMethodWithArity2.methods == [foo: 2]
-    assert JustMethodsWithArities2.methods == [foo: 0, bar: 1, baz: 2]
-    assert JustFields2.methods == [foo: 0, set_foo: 1]
-    assert FieldsAndMethods2.methods == [foo: 0, set_foo: 1, bar: 1]
+    assert Empty.methods == []
+    assert JustMethod.methods == [foo: 0]
+    assert JustMethodWithArity.methods == [foo: 2]
+    assert JustMethodsWithArities.methods == [foo: 0, bar: 1, baz: 2]
+    assert JustFields.methods == [foo: 0, set_foo: 1]
+    assert FieldsAndMethods.methods == [foo: 0, set_foo: 1, bar: 1]
+
+    purge [Empty, JustMethod, JustMethod, JustMethodWirthArity, JustMethodsWithArities, JustFields, FieldsAndMethods]
+  end
+
+  defp purge(module) when is_atom(module) do
+    :code.delete(module)
+    :code.purge(module)
+  end
+  defp purge(modules) when is_list(modules) do
+    Enum.each(modules, &purge/1)
   end
 end
