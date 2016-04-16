@@ -172,6 +172,29 @@ defmodule OOPTest do
     assert Post.new(title: "Post 1").title == "Post 1"
   end
 
+  test "abstract class inheriting from abstract class" do
+    import OOP
+    abstract class ActiveRecord.Base2 do
+    end
+
+    abstract class ApplicationRecord < ActiveRecord.Base2 do
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+      ActiveRecord.Base2.new
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+      ApplicationRecord.new
+    end
+
+    class Post2 < ApplicationRecord do
+      var :title
+    end
+
+    assert Post2.new(title: "Post 1").title == "Post 1"
+  end
+
   test "returns fields defined on a class" do
     import OOP
     class Empty do
