@@ -74,7 +74,7 @@ defmodule OOP do
 
         def new(fields \\ [], descendant? \\ false) do
           if !descendant? && unquote(abstract?) do
-            raise "cannot instantiate abstract class"
+            raise "cannot instantiate abstract class #{unquote(class)}"
           end
 
           object = :"#{unquote(class)}#{:erlang.unique_integer}"

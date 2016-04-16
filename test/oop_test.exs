@@ -162,7 +162,7 @@ defmodule OOPTest do
     abstract class ActiveRecord.Base do
     end
 
-    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ActiveRecord.Base}", fn ->
       ActiveRecord.Base.new
     end
 
@@ -181,11 +181,11 @@ defmodule OOPTest do
     abstract class ApplicationRecord < ActiveRecord.Base do
     end
 
-    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ActiveRecord.Base}", fn ->
       ActiveRecord.Base.new
     end
 
-    assert_raise RuntimeError, "cannot instantiate abstract class", fn ->
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ApplicationRecord}", fn ->
       ApplicationRecord.new
     end
 
