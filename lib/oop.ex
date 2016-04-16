@@ -36,6 +36,14 @@ defmodule OOP do
     end
   end
 
+  defmacro final(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), final: true)
+    end
+  end
+
   defp create_class(class, superclasses, block, opts) do
     fields = extract_fields(block)
     methods = extract_methods(block)
@@ -43,6 +51,19 @@ defmodule OOP do
 
     quote do
       defmodule unquote(class) do
+
+        Enum.each(unquote(superclasses), fn s ->
+          if s.__final__? do
+            raise "cannot subclass final class #{s}"
+          end
+        end)
+
+        @final Keyword.get(unquote(opts), :final, false)
+
+        def __final__? do
+          @final
+        end
+
         def fields do
           unquote(fields) ++ Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
         end

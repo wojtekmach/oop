@@ -197,6 +197,18 @@ defmodule OOPTest do
     purge [ActiveRecord.Base, ApplicationRecord, Post]
   end
 
+  test "define final class" do
+    final class FriezaForthForm do
+    end
+
+    assert FriezaForthForm.new
+
+    assert_raise RuntimeError, "cannot subclass final class #{FriezaForthForm}", fn ->
+      class FriezaFifthForm < FriezaForthForm do
+      end
+    end
+  end
+
   test "returns fields defined on a class" do
     class Empty do
     end
