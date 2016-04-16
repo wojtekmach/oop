@@ -1,9 +1,8 @@
 defmodule OOPTest do
   use ExUnit.Case
+  import OOP
 
   test "all features" do
-    import OOP
-
     class Person do
       var :first_name
       var :last_name
@@ -24,7 +23,6 @@ defmodule OOPTest do
   end
 
   test "define empty class" do
-    import OOP
     c = class Person1 do
     end
 
@@ -32,7 +30,6 @@ defmodule OOPTest do
   end
 
   test "instantiate empty object" do
-    import OOP
     class Person2 do
     end
 
@@ -41,7 +38,6 @@ defmodule OOPTest do
   end
 
   test "define methods on objects" do
-    import OOP
     class Person3 do
       def the_answer do
         42
@@ -53,7 +49,6 @@ defmodule OOPTest do
   end
 
   test "define fields on objects" do
-    import OOP
     class Person4 do
       var :name
     end
@@ -63,7 +58,6 @@ defmodule OOPTest do
   end
 
   test "set field values" do
-    import OOP
     class Person5 do
       var :name
     end
@@ -75,7 +69,6 @@ defmodule OOPTest do
   end
 
   test "instantiate objects with fields" do
-    import OOP
     class Person6 do
       var :name
     end
@@ -89,7 +82,6 @@ defmodule OOPTest do
   end
 
   test "this" do
-    import OOP
     class Person7 do
       var :name
 
@@ -103,7 +95,6 @@ defmodule OOPTest do
   end
 
   test "multiple objects" do
-    import OOP
     class Person8 do
       var :name
     end
@@ -119,7 +110,6 @@ defmodule OOPTest do
   end
 
   test "inheritance" do
-    import OOP
     class Animal do
       var :name
 
@@ -139,7 +129,6 @@ defmodule OOPTest do
   end
 
   test "multiple inheritance" do
-    import OOP
     class Human do
       var :name
     end
@@ -157,7 +146,6 @@ defmodule OOPTest do
   end
 
   test "define abstract class" do
-    import OOP
     abstract class ActiveRecord.Base do
     end
 
@@ -173,7 +161,6 @@ defmodule OOPTest do
   end
 
   test "abstract class inheriting from abstract class" do
-    import OOP
     abstract class ActiveRecord.Base2 do
     end
 
@@ -196,7 +183,6 @@ defmodule OOPTest do
   end
 
   test "returns fields defined on a class" do
-    import OOP
     class Empty do
     end
 
@@ -237,7 +223,6 @@ defmodule OOPTest do
   end
 
   test "returns methods defined on a class" do
-    import OOP
     class Empty2 do
     end
 
