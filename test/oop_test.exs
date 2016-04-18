@@ -253,6 +253,15 @@ defmodule OOPTest do
       var :bar
     end
 
+    class JustPrivateField do
+      private_var :foo
+    end
+
+    class JustPrivateFields do
+      private_var :foo
+      private_var :bar
+    end
+
     class FieldsAndMethods do
       var :foo
 
@@ -265,9 +274,11 @@ defmodule OOPTest do
     assert JustMethods.fields == []
     assert JustField.fields == [:foo]
     assert JustFields.fields == [:foo, :bar]
+    assert JustPrivateField.fields == [:foo]
+    assert JustPrivateFields.fields == [:foo, :bar]
     assert FieldsAndMethods.fields == [:foo]
 
-    purge [Empty, JustMethod, JustMethods, JustField, JustFields, FieldsAndMethods]
+    purge [Empty, JustMethod, JustMethods, JustField, JustFields, JustPrivateField, JustPrivateFields, FieldsAndMethods]
   end
 
   test "returns methods defined on a class" do

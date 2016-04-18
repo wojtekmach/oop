@@ -131,6 +131,7 @@ defmodule OOP do
     [{name, extract_arity(arg_exprs)}]
   end
   defp extract_methods([do: {:var, _, [field]}]), do: [{field, 0}, {:"set_#{field}", 1}]
+  defp extract_methods([do: {:private_var, _, [field]}]), do: [{field, 0}, {:"set_#{field}", 1}]
   defp extract_methods([do: {:__block__, _, declarations}]) do
     methods =
       for {:def, _, [{name, _, arg_exprs}, _code]} <- declarations do
