@@ -77,6 +77,8 @@ john.name # => "John"
 john.horseshoes_on? # => true
 ```
 
+See more usage in the [test suite](test/oop_test.exs).
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
