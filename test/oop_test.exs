@@ -327,6 +327,16 @@ defmodule OOPTest do
     purge [Empty, JustMethod, JustMethod, JustMethodWirthArity, JustMethodsWithArities, JustFields, FieldsAndMethods]
   end
 
+  test "define static methods" do
+    class Main do
+      static def main(args) do
+        {:ok, args}
+      end
+    end
+
+    assert Main.main([:foo, :bar]) == {:ok, [:foo, :bar]}
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)

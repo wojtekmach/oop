@@ -47,10 +47,13 @@ defmodule OOP do
   defp create_class(class, superclasses, block, opts) do
     fields = extract_fields(block)
     methods = extract_methods(block)
+    static_methods = extract_static_methods(block)
     abstract? = Keyword.get(opts, :abstract, false)
 
     quote do
       defmodule unquote(class) do
+
+        unquote(static_methods)
 
         Enum.each(unquote(superclasses), fn s ->
           if s.__final__? do
@@ -120,6 +123,7 @@ defmodule OOP do
 
   defp extract_fields([do: nil]), do: []
   defp extract_fields([do: {:def, _, _}]), do: []
+  defp extract_fields([do: {:static, _, _}]), do: []
   defp extract_fields([do: {:__block__, _, declarations}]) do
     for {var, _, [field]} <- declarations, var in [:var, :private_var], do: field
   end
@@ -130,6 +134,7 @@ defmodule OOP do
   defp extract_methods([do: {:def, _, [{name, _, arg_exprs}, _code]}]) do
     [{name, extract_arity(arg_exprs)}]
   end
+  defp extract_methods([do: {:static, _, _}]), do: []
   defp extract_methods([do: {:var, _, [field]}]), do: [{field, 0}, {:"set_#{field}", 1}]
   defp extract_methods([do: {:private_var, _, [field]}]), do: [{field, 0}, {:"set_#{field}", 1}]
   defp extract_methods([do: {:__block__, _, declarations}]) do
@@ -145,6 +150,14 @@ defmodule OOP do
 
     List.flatten(field_methods) ++ methods
   end
+
+  defp extract_static_methods([do: {:static, _, expr}]) do
+    [{:def, _, [{name, _, args}]}, body] = expr
+
+    {:def, [],
+     [{name, [], args}, body]}
+  end
+  defp extract_static_methods(_), do: []
 
   defp extract_arity(nil), do: 0
   defp extract_arity(exprs), do: length(exprs)
