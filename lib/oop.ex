@@ -1,15 +1,25 @@
 defmodule OOP do
   defmodule ObjectServer do
+    use GenServer
+
     def start_link(object, fields) do
-      Agent.start_link(fn -> struct(object, fields) end, name: object)
+      GenServer.start_link(__MODULE__, struct(object, fields), name: object)
     end
 
     def get(object, field) do
-      Agent.get(object, fn data -> Map.fetch!(data, field) end)
+      GenServer.call(object, {:get, field})
     end
 
     def set(object, field, value) do
-      Agent.update(object, fn data -> %{data | field => value} end)
+      GenServer.cast(object, {:set, field, value})
+    end
+
+    def handle_call({:get, field}, _from, data) do
+      {:reply, Map.fetch!(data, field), data}
+    end
+
+    def handle_cast({:set, field, value}, data) do
+      {:noreply, %{data | field => value}}
     end
   end
 
