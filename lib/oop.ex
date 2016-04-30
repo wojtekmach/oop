@@ -1,28 +1,4 @@
 defmodule OOP do
-  defmodule ObjectServer do
-    use GenServer
-
-    def start_link(object, fields) do
-      GenServer.start_link(__MODULE__, struct(object, fields), name: object)
-    end
-
-    def get(object, field) do
-      GenServer.call(object, {:get, field})
-    end
-
-    def set(object, field, value) do
-      GenServer.cast(object, {:set, field, value})
-    end
-
-    def handle_call({:get, field}, _from, data) do
-      {:reply, Map.fetch!(data, field), data}
-    end
-
-    def handle_cast({:set, field, value}, data) do
-      {:noreply, %{data | field => value}}
-    end
-  end
-
   defmacro class(class_expr, block, opts \\ []) do
     {class, superclasses} = case class_expr do
       {:<, _, [class, superclasses]} when is_list(superclasses) ->
@@ -94,6 +70,28 @@ defmodule OOP do
           superclass_fields = Enum.flat_map(unquote(superclasses), fn s -> s.fields end)
 
           defmodule object do
+            use GenServer
+
+            def start_link(object, fields) do
+              GenServer.start_link(__MODULE__, struct(object, fields), name: object)
+            end
+
+            def get(object, field) do
+              GenServer.call(object, {:get, field})
+            end
+
+            def set(object, field, value) do
+              GenServer.cast(object, {:set, field, value})
+            end
+
+            def handle_call({:get, field}, _from, data) do
+              {:reply, Map.fetch!(data, field), data}
+            end
+
+            def handle_cast({:set, field, value}, data) do
+              {:noreply, %{data | field => value}}
+            end
+
             unquote(block)
 
             for superclass <- unquote(superclasses) do
@@ -112,7 +110,7 @@ defmodule OOP do
                 raise ArgumentError, "unknown field #{inspect(field)}"
               end
 
-              {:ok, _pid} = ObjectServer.start_link(__MODULE__, fields)
+              {:ok, _pid} = __MODULE__.start_link(__MODULE__, fields)
             end
 
             def class do
@@ -182,19 +180,19 @@ defmodule OOP do
     quote do
       if unquote(private?) do
         defp unquote(field)() do
-          ObjectServer.get(__MODULE__, unquote(field))
+          GenServer.call(__MODULE__, {:get, unquote(field)})
         end
 
         defp unquote(:"set_#{field}")(value) do
-          ObjectServer.set(__MODULE__, unquote(field), value)
+          GenServer.cast(__MODULE__, {:set, unquote(field), value})
         end
       else
         def unquote(field)() do
-          ObjectServer.get(__MODULE__, unquote(field))
+          GenServer.call(__MODULE__, {:get, unquote(field)})
         end
 
         def unquote(:"set_#{field}")(value) do
-          ObjectServer.set(__MODULE__, unquote(field), value)
+          GenServer.cast(__MODULE__, {:set, unquote(field), value})
         end
       end
     end
