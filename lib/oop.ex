@@ -151,7 +151,7 @@ defmodule OOP do
     List.flatten(field_methods) ++ methods
   end
 
-  defp extract_static_methods([do: {:static, _, [{:def, _, [{name, _, args}]}, body] = expr}]) do
+  defp extract_static_methods([do: {:static, _, [{:def, _, [{name, _, args}]}, body]}]) do
     {:def, [],
      [{name, [], args}, body]}
   end
