@@ -41,6 +41,24 @@ defmodule OOPTest do
     purge Person
   end
 
+  test "define fields" do
+    class Person do
+      var :name
+    end
+
+    alice = Person.new
+    assert alice.name == nil
+
+    bob = Person.new(name: "Bob")
+    assert bob.name == "Bob"
+    bob.set_name("Hipster Bob")
+    assert bob.name == "Hipster Bob"
+
+    assert alice.name == nil
+
+    purge Person
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)
