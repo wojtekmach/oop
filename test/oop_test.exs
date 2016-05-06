@@ -10,6 +10,15 @@ defmodule OOPTest do
     purge Person
   end
 
+  test "instantiate empty object" do
+    class Person do
+    end
+
+    alice = Person.new
+    assert alice.class == Person
+    purge Person
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)
