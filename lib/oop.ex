@@ -73,6 +73,9 @@ defmodule OOP do
             end
 
             import Kernel, except: [def: 2]
+
+            Module.register_attribute(__MODULE__, :friends, accumulate: true)
+
             unquote(block)
 
             Enum.each(unquote(superclasses), fn superclass ->
@@ -120,19 +123,33 @@ defmodule OOP do
 
     quote do
       def unquote(call) do
-        GenServer.call(__MODULE__, {:call, unquote(method), unquote(args)})
+        case GenServer.call(__MODULE__, {:call, unquote(method), unquote(args)}) do
+          {:ok, value} -> value
+          {:error, e} -> raise e
+        end
       end
 
       if unquote(using_this?) do
         def handle_call({:call, unquote(method), unquote(args)}, {pid, _ref}, data) do
           var!(this) = data
-          [do: value] = unquote(expr)
-          {:reply, value, data}
+
+          try do
+            [do: value] = unquote(expr)
+            {:reply, {:ok, value}, data}
+          rescue
+            e in [RuntimeError] ->
+              {:reply, {:error, e}, data}
+          end
         end
       else
         def handle_call({:call, unquote(method), unquote(args)}, {pid, _ref}, data) do
-          [do: value] = unquote(expr)
-          {:reply, value, data}
+          try do
+            [do: value] = unquote(expr)
+            {:reply, {:ok, value}, data}
+          rescue
+            e in [RuntimeError] ->
+              {:reply, {:error, e}, data}
+          end
         end
       end
     end
@@ -154,7 +171,7 @@ defmodule OOP do
       end
 
       def handle_call({:get, unquote(field)}, {pid, _ref}, data) do
-        if unquote(private?) and Registry.get(pid) != class do
+        if unquote(private?) and ! Registry.get(pid) in [class | @friends] do
           {:reply, {:error, :private}, data}
         else
           {:reply, {:ok, Map.get(data, unquote(field))}, data}
@@ -170,6 +187,12 @@ defmodule OOP do
   defmacro private_var(field) do
     quote do
       var(unquote(field), private: true)
+    end
+  end
+
+  defmacro friend(class) do
+    quote do
+      @friends unquote(class)
     end
   end
 

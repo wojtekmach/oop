@@ -84,6 +84,37 @@ defmodule OOPTest do
     purge AppleInc
   end
 
+  test "define friend class" do
+    class NSA do
+      def get_data(company) do
+        company.registered_devices
+      end
+    end
+
+    class Thief do
+      def get_data(company) do
+        company.registered_devices
+      end
+    end
+
+    class AppleInc do
+      friend NSA
+      private_var :registered_devices
+    end
+
+    apple = AppleInc.new(registered_devices: ["Alice's iPhone", "Bob's iPhone"])
+    thief = Thief.new
+    nsa = NSA.new
+
+    assert_raise RuntimeError, "Cannot access private var registered_devices", fn ->
+      thief.get_data(apple)
+    end
+
+    assert nsa.get_data(apple) == ["Alice's iPhone", "Bob's iPhone"]
+
+    purge [AppleInc, Thief, NSA]
+  end
+
   test "inheritance" do
     class Animal do
       var :name
