@@ -1,6 +1,4 @@
 defmodule OOP do
-  use Application
-
   defmodule Registry do
     def start_link do
       Agent.start_link(fn -> %{} end, name: __MODULE__)
@@ -15,12 +13,10 @@ defmodule OOP do
     end
   end
 
-  def start do
-    Registry.start_link()
-  end
+  use Application
 
   def start(_type, _args) do
-    start()
+    Registry.start_link()
   end
 
   defmacro class(class_expr, block, opts \\ []) do
