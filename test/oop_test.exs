@@ -75,7 +75,7 @@ defmodule OOPTest do
 
     apple = AppleInc.new(registered_devices: ["Alice's iPhone", "Bob's iPhone"])
 
-    assert_raise RuntimeError, fn ->
+    assert_raise RuntimeError, "Cannot access private var registered_devices", fn ->
       apple.registered_devices
     end
 
