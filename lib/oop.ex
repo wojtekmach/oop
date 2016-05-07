@@ -30,6 +30,16 @@ defmodule OOP do
 
     quote do
       defmodule unquote(class) do
+        @final Keyword.get(unquote(opts), :final, false)
+
+        def __final__? do
+          @final
+        end
+
+        Enum.each(unquote(superclasses), fn s ->
+          if s.__final__?, do: raise "cannot subclass final class #{s}"
+        end)
+
         def new(data \\ [], descendant? \\ false) do
           if !descendant? and unquote(abstract?) do
             raise "cannot instantiate abstract class #{unquote(class)}"
@@ -84,6 +94,14 @@ defmodule OOP do
 
     quote do
       OOP.class(unquote(class), unquote(block), abstract: true)
+    end
+  end
+
+	defmacro final(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), final: true)
     end
   end
 

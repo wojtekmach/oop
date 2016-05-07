@@ -140,6 +140,18 @@ defmodule OOPTest do
     purge [ActiveRecord.Base, Post]
   end
 
+  test "define final class" do
+    final class FriezaForthForm do
+    end
+
+    assert FriezaForthForm.new
+
+    assert_raise RuntimeError, "cannot subclass final class #{FriezaForthForm}", fn ->
+      class FriezaFifthForm < FriezaForthForm do
+      end
+    end
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)
