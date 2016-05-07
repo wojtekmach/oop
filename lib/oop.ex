@@ -136,7 +136,7 @@ defmodule OOP do
       end
 
       if unquote(using_this?) do
-        def handle_call({:call, unquote(method), unquote(args)}, {pid, _ref}, data) do
+        def handle_call({:call, unquote(method), unquote(args)}, _from, data) do
           var!(this) = data
 
           try do
@@ -148,7 +148,7 @@ defmodule OOP do
           end
         end
       else
-        def handle_call({:call, unquote(method), unquote(args)}, {pid, _ref}, data) do
+        def handle_call({:call, unquote(method), unquote(args)}, _from, data) do
           try do
             [do: value] = unquote(expr)
             {:reply, {:ok, value}, data}
