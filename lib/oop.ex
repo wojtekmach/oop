@@ -13,6 +13,10 @@ defmodule OOP do
     end
   end
 
+  def start do
+    Registry.start_link()
+  end
+
   defmacro class(class_expr, block, opts \\ []) do
 		abstract? = Keyword.get(opts, :abstract, false)
 
