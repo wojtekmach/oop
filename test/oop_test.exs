@@ -124,6 +124,22 @@ defmodule OOPTest do
     purge [Human, Horse, Centaur]
   end
 
+  test "define abstract class" do
+    abstract class ActiveRecord.Base do
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ActiveRecord.Base}", fn ->
+      ActiveRecord.Base.new
+    end
+
+    class Post < ActiveRecord.Base do
+      var :title
+    end
+
+    assert Post.new(title: "Post 1").title == "Post 1"
+    purge [ActiveRecord.Base, Post]
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)

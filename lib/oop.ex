@@ -13,7 +13,9 @@ defmodule OOP do
     end
   end
 
-  defmacro class(class_expr, block, _opts \\ []) do
+  defmacro class(class_expr, block, opts \\ []) do
+		abstract? = Keyword.get(opts, :abstract, false)
+
     {class, superclasses} =
       case class_expr do
         {:<, _, [class, superclasses]} when is_list(superclasses) ->
@@ -28,7 +30,11 @@ defmodule OOP do
 
     quote do
       defmodule unquote(class) do
-        def new(data \\ []) do
+        def new(data \\ [], descendant? \\ false) do
+          if !descendant? and unquote(abstract?) do
+            raise "cannot instantiate abstract class #{unquote(class)}"
+          end
+
           object = :"#{unquote(class)}#{:erlang.unique_integer()}"
 
           defmodule object do
@@ -56,7 +62,7 @@ defmodule OOP do
             unquote(block)
 
             Enum.each(unquote(superclasses), fn superclass ->
-              parent = superclass.new(data)
+              parent = superclass.new(data, true)
 
               for {method, arity} <- parent.methods do
                 Code.eval_quoted(inherit_method(method, arity, parent), [], __ENV__)
@@ -70,6 +76,14 @@ defmodule OOP do
           object
         end
       end
+    end
+  end
+
+	defmacro abstract(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), abstract: true)
     end
   end
 
