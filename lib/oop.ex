@@ -24,7 +24,7 @@ defmodule OOP do
   end
 
   defmacro class(class_expr, block, opts \\ []) do
-		abstract? = Keyword.get(opts, :abstract, false)
+    abstract? = Keyword.get(opts, :abstract, false)
 
     {class, superclasses} =
       case class_expr do
