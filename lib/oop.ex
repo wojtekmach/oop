@@ -1,23 +1,27 @@
-defmodule OOP do
-  defmodule Registry do
-    def start_link do
-      Agent.start_link(fn -> %{} end, name: __MODULE__)
-    end
-
-    def register(pid, class) do
-      Agent.update(__MODULE__, fn map -> Map.put(map, pid, class) end)
-    end
-
-    def get(pid) do
-      Agent.get(__MODULE__, fn map -> Map.get(map, pid, nil) end)
-    end
+defmodule OOP.Registry do
+  def start_link do
+    Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
 
+  def register(pid, class) do
+    Agent.update(__MODULE__, fn map -> Map.put(map, pid, class) end)
+  end
+
+  def get(pid) do
+    Agent.get(__MODULE__, fn map -> Map.get(map, pid, nil) end)
+  end
+end
+
+defmodule OOP.Application do
   use Application
 
   def start(_type, _args) do
-    Registry.start_link()
+    OOP.Registry.start_link()
   end
+end
+
+defmodule OOP do
+  alias OOP.Registry
 
   defmacro class(class_expr, block, opts \\ []) do
     {class, superclasses} =
