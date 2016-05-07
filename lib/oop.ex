@@ -110,7 +110,7 @@ defmodule OOP do
     end
   end
 
-	defmacro final(class_expr, block) do
+  defmacro final(class_expr, block) do
     {:class, _, [class]} = class_expr
 
     quote do
