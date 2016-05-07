@@ -20,26 +20,8 @@ defmodule OOP.Application do
   end
 end
 
-defmodule OOP do
-  alias OOP.Registry
-
-  defmacro class(class_expr, block, opts \\ []) do
-    {class, superclasses} =
-      case class_expr do
-        {:<, _, [class, superclasses]} when is_list(superclasses) ->
-          {class, superclasses}
-
-        {:<, _, [class, superclass]} ->
-          {class, [superclass]}
-
-        class ->
-          {class, []}
-      end
-
-    create_class(class, superclasses, block, opts)
-  end
-
-  defp create_class(class, superclasses, block, opts) do
+defmodule OOP.Builder do
+  def create_class(class, superclasses, block, opts) do
     abstract? = Keyword.get(opts, :abstract, false)
 
     quote do
@@ -92,13 +74,13 @@ defmodule OOP do
               parent = superclass.new(data, true)
 
               for {method, arity} <- parent.methods do
-                Code.eval_quoted(inherit_method(method, arity, parent), [], __ENV__)
+                Code.eval_quoted(OOP.Builder.inherit_method(method, arity, parent), [], __ENV__)
               end
             end)
           end
 
           {:ok, pid} = object.start_link(Enum.into(data, %{}))
-          Registry.register(pid, unquote(class))
+          OOP.Registry.register(pid, unquote(class))
 
           object
         end
@@ -106,23 +88,7 @@ defmodule OOP do
     end
   end
 
-	defmacro abstract(class_expr, block) do
-    {:class, _, [class]} = class_expr
-
-    quote do
-      OOP.class(unquote(class), unquote(block), abstract: true)
-    end
-  end
-
-  defmacro final(class_expr, block) do
-    {:class, _, [class]} = class_expr
-
-    quote do
-      OOP.class(unquote(class), unquote(block), final: true)
-    end
-  end
-
-  defmacro def(call, expr \\ nil) do
+  def create_method(call, expr) do
     # HACK: this is a really gross way of checking if the function is using `this`.
     #       if so, we let it leak: `var!(this) = data`.
     #       We do this so that we don't get the "unused variable this" warning when
@@ -165,7 +131,14 @@ defmodule OOP do
     end
   end
 
-  defmacro var(field, opts \\ []) do
+  def inherit_method(method, arity, parent) do
+    args = (0..arity) |> Enum.drop(1) |> Enum.map(fn i -> {:"arg#{i}", [], OOP} end)
+
+    {:defdelegate, [context: OOP, import: Kernel],
+      [{method, [], args}, [to: parent]]}
+  end
+
+  def create_var(field, opts) do
     private? = Keyword.get(opts, :private, false)
 
     quote do
@@ -181,7 +154,7 @@ defmodule OOP do
       end
 
       def handle_call({:get, unquote(field)}, {pid, _ref}, data) do
-        if unquote(private?) and ! Registry.get(pid) in [class | @friends] do
+        if unquote(private?) and ! OOP.Registry.get(pid) in [class | @friends] do
           {:reply, {:error, :private}, data}
         else
           {:reply, {:ok, Map.get(data, unquote(field))}, data}
@@ -192,6 +165,48 @@ defmodule OOP do
         {:reply, value, Map.put(data, unquote(field), value)}
       end
     end
+  end
+end
+
+defmodule OOP do
+  defmacro class(class_expr, block, opts \\ []) do
+    {class, superclasses} =
+      case class_expr do
+        {:<, _, [class, superclasses]} when is_list(superclasses) ->
+          {class, superclasses}
+
+        {:<, _, [class, superclass]} ->
+          {class, [superclass]}
+
+        class ->
+          {class, []}
+      end
+
+    OOP.Builder.create_class(class, superclasses, block, opts)
+  end
+
+	defmacro abstract(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), abstract: true)
+    end
+  end
+
+  defmacro final(class_expr, block) do
+    {:class, _, [class]} = class_expr
+
+    quote do
+      OOP.class(unquote(class), unquote(block), final: true)
+    end
+  end
+
+  defmacro def(call, expr \\ nil) do
+    OOP.Builder.create_method(call, expr)
+  end
+
+  defmacro var(field, opts \\ []) do
+    OOP.Builder.create_var(field, opts)
   end
 
   defmacro private_var(field) do
@@ -204,12 +219,5 @@ defmodule OOP do
     quote do
       @friends unquote(class)
     end
-  end
-
-  def inherit_method(method, arity, parent) do
-    args = (0..arity) |> Enum.drop(1) |> Enum.map(fn i -> {:"arg#{i}", [], OOP} end)
-
-    {:defdelegate, [context: OOP, import: Kernel],
-      [{method, [], args}, [to: parent]]}
   end
 end
