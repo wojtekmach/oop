@@ -204,6 +204,8 @@ defmodule OOPTest do
       class FriezaFifthForm < FriezaForthForm do
       end
     end
+
+    purge [FriezaForthForm, FriezaFifthForm]
   end
 
   defp purge(module) when is_atom(module) do
