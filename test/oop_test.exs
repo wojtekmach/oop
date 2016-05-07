@@ -64,6 +64,27 @@ defmodule OOPTest do
     purge Person
   end
 
+  test "inheritance" do
+    class Animal do
+      var :name
+
+      def title(prefix) do
+        "#{prefix} #{name}"
+      end
+    end
+
+    class Dog < Animal do
+      var :breed
+    end
+
+    snuffles = Dog.new(name: "Snuffles", breed: "Shih Tzu")
+    assert snuffles.name == "Snuffles"
+    assert snuffles.breed == "Shih Tzu"
+    assert snuffles.title("Mr.") == "Mr. Snuffles"
+
+    purge [Animal, Dog]
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)

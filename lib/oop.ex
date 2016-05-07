@@ -1,9 +1,17 @@
 defmodule OOP do
   defmacro class(class_expr, block, _opts \\ []) do
+    {class, superclass} =
+      case class_expr do
+        {:<, _, [class, superclass]} ->
+          {class, superclass}
+        class ->
+          {class, nil}
+      end
+
     quote do
-      defmodule unquote(class_expr) do
+      defmodule unquote(class) do
         def new(data \\ []) do
-          object = :"#{unquote(class_expr)}#{:erlang.unique_integer()}"
+          object = :"#{unquote(class)}#{:erlang.unique_integer()}"
 
           defmodule object do
             use GenServer
@@ -13,10 +21,28 @@ defmodule OOP do
             end
 
             def class do
-              unquote(class_expr)
+              unquote(class)
+            end
+
+            def methods do
+              built_ins = [
+                code_change: 3, handle_call: 3, handle_cast: 2, handle_info: 2,
+                init: 1, start_link: 1, terminate: 2,
+                class: 0, methods: 0,
+              ]
+
+              __MODULE__.__info__(:functions) -- built_ins
             end
 
             unquote(block)
+
+            if unquote(superclass) do
+              @parent unquote(superclass).new(data)
+
+              for {method, arity} <- @parent.methods do
+                Code.eval_quoted(inherit_method(method, arity, @parent), [], __ENV__)
+              end
+            end
           end
 
           {:ok, pid} = object.start_link(Enum.into(data, %{}))
@@ -45,5 +71,12 @@ defmodule OOP do
         {:reply, value, Map.put(data, unquote(field), value)}
       end
     end
+  end
+
+  def inherit_method(method, arity, parent) do
+    args = (0..arity) |> Enum.drop(1) |> Enum.map(fn i -> {:"arg#{i}", [], OOP} end)
+
+    {:defdelegate, [context: OOP, import: Kernel],
+      [{method, [], args}, [to: parent]]}
   end
 end
