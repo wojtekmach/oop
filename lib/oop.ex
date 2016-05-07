@@ -185,7 +185,7 @@ defmodule OOP do
     OOP.Builder.create_class(class, superclasses, block, opts)
   end
 
-	defmacro abstract(class_expr, block) do
+  defmacro abstract(class_expr, block) do
     {:class, _, [class]} = class_expr
 
     quote do
