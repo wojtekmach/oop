@@ -76,7 +76,7 @@ See more usage in the [test suite](test/oop_test.exs).
 
     ```elixir
     def deps do
-      [{:oop, "~> 0.0.1"}]
+      [{:oop, "~> 0.1.0"}]
     end
     ```
 
