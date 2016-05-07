@@ -10,20 +10,14 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 
 ```elixir
 import OOP
+OOP.start
 
 class Person do
   var :name
 
   def say_hello_to(who) do
-    say_to(who, "Hello #{who.name}")
-  end
-
-  def say_to(who, something) do
-    who.hear_from(this, something)
-  end
-
-  def hear_from(who, what) do
-    IO.puts("#{who.name}: #{what}")
+    what = "Hello #{who.name}"
+    IO.puts("#{this.name}: #{what}")
   end
 end
 
@@ -38,8 +32,6 @@ robert.say_hello_to(mike) # Robert: Hello Mike
 
 joe.set_name("Hipster Joe")
 joe.name # => Hipster Joe
-
-joe.say_to(robert, "I like this OOP thing") # ** (exit) "reasons"
 ```
 
 An OOP library wouldn't be complete without inheritance:
