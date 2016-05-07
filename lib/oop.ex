@@ -24,8 +24,6 @@ defmodule OOP do
   end
 
   defmacro class(class_expr, block, opts \\ []) do
-    abstract? = Keyword.get(opts, :abstract, false)
-
     {class, superclasses} =
       case class_expr do
         {:<, _, [class, superclasses]} when is_list(superclasses) ->
@@ -37,6 +35,12 @@ defmodule OOP do
         class ->
           {class, []}
       end
+
+    create_class(class, superclasses, block, opts)
+  end
+
+  defp create_class(class, superclasses, block, opts) do
+    abstract? = Keyword.get(opts, :abstract, false)
 
     quote do
       defmodule unquote(class) do
