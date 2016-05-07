@@ -46,7 +46,7 @@ defmodule OOPTest do
       var :name
 
       def title(prefix) do
-        "#{prefix} #{name}"
+        "#{prefix} #{this.name}"
       end
     end
 
@@ -64,12 +64,32 @@ defmodule OOPTest do
     purge Person
   end
 
+  test "define private fields" do
+    class AppleInc do
+      private_var :registered_devices
+
+      def registered_devices_count do
+        length(this.registered_devices)
+      end
+    end
+
+    apple = AppleInc.new(registered_devices: ["Alice's iPhone", "Bob's iPhone"])
+
+    assert_raise RuntimeError, fn ->
+      apple.registered_devices
+    end
+
+    assert apple.registered_devices_count == 2
+
+    purge AppleInc
+  end
+
   test "inheritance" do
     class Animal do
       var :name
 
       def title(prefix) do
-        "#{prefix} #{name}"
+        "#{prefix} #{this.name}"
       end
     end
 
