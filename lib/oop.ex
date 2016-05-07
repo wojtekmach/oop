@@ -14,12 +14,16 @@ defmodule OOP do
   end
 
   defmacro class(class_expr, block, _opts \\ []) do
-    {class, superclass} =
+    {class, superclasses} =
       case class_expr do
+        {:<, _, [class, superclasses]} when is_list(superclasses) ->
+          {class, superclasses}
+
         {:<, _, [class, superclass]} ->
-          {class, superclass}
+          {class, [superclass]}
+
         class ->
-          {class, nil}
+          {class, []}
       end
 
     quote do
@@ -51,13 +55,13 @@ defmodule OOP do
             import Kernel, except: [def: 2]
             unquote(block)
 
-            if unquote(superclass) do
-              @parent unquote(superclass).new(data)
+            Enum.each(unquote(superclasses), fn superclass ->
+              parent = superclass.new(data)
 
-              for {method, arity} <- @parent.methods do
-                Code.eval_quoted(inherit_method(method, arity, @parent), [], __ENV__)
+              for {method, arity} <- parent.methods do
+                Code.eval_quoted(inherit_method(method, arity, parent), [], __ENV__)
               end
-            end
+            end)
           end
 
           {:ok, pid} = object.start_link(Enum.into(data, %{}))

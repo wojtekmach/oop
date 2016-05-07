@@ -105,6 +105,25 @@ defmodule OOPTest do
     purge [Animal, Dog]
   end
 
+  test "multiple inheritance" do
+    class Human do
+      var :name
+    end
+
+    class Horse do
+      var :horseshoes_on?
+    end
+
+    class Centaur < [Human, Horse] do
+    end
+
+    john = Centaur.new(name: "John", horseshoes_on?: true)
+    assert john.name == "John"
+    assert john.horseshoes_on? == true
+
+    purge [Human, Horse, Centaur]
+  end
+
   defp purge(module) when is_atom(module) do
     :code.delete(module)
     :code.purge(module)
