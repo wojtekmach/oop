@@ -44,6 +44,10 @@ defmodule OOPTest do
   test "define fields" do
     class Person do
       var :name
+
+      def title(prefix) do
+        "#{prefix} #{name}"
+      end
     end
 
     alice = Person.new
@@ -53,6 +57,7 @@ defmodule OOPTest do
     assert bob.name == "Bob"
     bob.set_name("Hipster Bob")
     assert bob.name == "Hipster Bob"
+    assert bob.title("Mr.") == "Mr. Hipster Bob"
 
     assert alice.name == nil
 
