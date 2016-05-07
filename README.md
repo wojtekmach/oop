@@ -10,7 +10,6 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 
 ```elixir
 import OOP
-OOP.start
 
 class Person do
   var :name
@@ -72,8 +71,6 @@ john.horseshoes_on? # => true
 See more usage in the [test suite](test/oop_test.exs).
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
   1. Add `oop` to your list of dependencies in `mix.exs`:
 
