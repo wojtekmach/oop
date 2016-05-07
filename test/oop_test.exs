@@ -140,6 +140,29 @@ defmodule OOPTest do
     purge [ActiveRecord.Base, Post]
   end
 
+  test "abstract class inheriting from abstract class" do
+    abstract class ActiveRecord.Base do
+    end
+
+    abstract class ApplicationRecord < ActiveRecord.Base do
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ActiveRecord.Base}", fn ->
+      ActiveRecord.Base.new
+    end
+
+    assert_raise RuntimeError, "cannot instantiate abstract class #{ApplicationRecord}", fn ->
+      ApplicationRecord.new
+    end
+
+    class Post < ApplicationRecord do
+      var :title
+    end
+
+    assert Post.new(title: "Post 1").title == "Post 1"
+    purge [ActiveRecord.Base, ApplicationRecord, Post]
+  end
+
   test "define final class" do
     final class FriezaForthForm do
     end
