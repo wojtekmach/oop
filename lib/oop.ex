@@ -97,6 +97,17 @@ defmodule OOP.Builder do
 
     {method, args} = Macro.decompose_call(call)
 
+    handle_call_quoted =
+      quote do
+        try do
+          [do: value] = unquote(expr)
+          {:reply, {:ok, value}, data}
+        rescue
+          e in [RuntimeError] ->
+            {:reply, {:error, e}, data}
+        end
+      end
+
     quote do
       def unquote(call) do
         case GenServer.call(__MODULE__, {:call, unquote(method), unquote(args)}) do
@@ -108,24 +119,11 @@ defmodule OOP.Builder do
       if unquote(using_this?) do
         def handle_call({:call, unquote(method), unquote(args)}, _from, data) do
           var!(this) = data
-
-          try do
-            [do: value] = unquote(expr)
-            {:reply, {:ok, value}, data}
-          rescue
-            e in [RuntimeError] ->
-              {:reply, {:error, e}, data}
-          end
+          unquote(handle_call_quoted)
         end
       else
         def handle_call({:call, unquote(method), unquote(args)}, _from, data) do
-          try do
-            [do: value] = unquote(expr)
-            {:reply, {:ok, value}, data}
-          rescue
-            e in [RuntimeError] ->
-              {:reply, {:error, e}, data}
-          end
+          unquote(handle_call_quoted)
         end
       end
     end
