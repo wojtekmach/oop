@@ -22,24 +22,18 @@ end
 
 defmodule OOP.Builder do
   def create_class(class, superclasses, block, opts) do
-    abstract? = Keyword.get(opts, :abstract, false)
-
     quote do
       defmodule unquote(class) do
+        OOP.Builder.ensure_can_be_subclassed(unquote(superclasses))
+
         @final Keyword.get(unquote(opts), :final, false)
 
         def __final__? do
           @final
         end
 
-        Enum.each(unquote(superclasses), fn s ->
-          if s.__final__?, do: raise "cannot subclass final class #{s}"
-        end)
-
         def new(data \\ [], descendant? \\ false) do
-          if !descendant? and unquote(abstract?) do
-            raise "cannot instantiate abstract class #{unquote(class)}"
-          end
+          OOP.Builder.ensure_can_be_instantiated(unquote(class), descendant?, unquote(opts))
 
           object = :"#{unquote(class)}#{:erlang.unique_integer()}"
 
@@ -85,6 +79,20 @@ defmodule OOP.Builder do
           object
         end
       end
+    end
+  end
+
+  def ensure_can_be_subclassed(superclasses) do
+    Enum.each(superclasses, fn s ->
+      if s.__final__?, do: raise "cannot subclass final class #{s}"
+    end)
+  end
+
+  def ensure_can_be_instantiated(class, descendant?, opts) do
+    abstract? = Keyword.get(opts, :abstract, false)
+
+    if !descendant? and abstract? do
+      raise "cannot instantiate abstract class #{class}"
     end
   end
 
