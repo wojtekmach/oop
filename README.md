@@ -6,6 +6,10 @@ Are you tired of all of that modules, processes and functions nonsense? Do you w
 
 [2] Please don't. You've been warned.
 
+## Demo
+
+[Lightning Talks - Wojtek Mach (ElixirConfEU 2016)](https://www.youtube.com/watch?v=5EtV2JUU0Z4)
+
 ## Example
 
 ```elixir
