@@ -195,17 +195,17 @@ defmodule OOPTest do
   end
 
   test "define final class" do
-    final class FriezaForthForm do
+    final class FriezaFourthForm do
     end
 
-    assert FriezaForthForm.new
+    assert FriezaFourthForm.new
 
-    assert_raise RuntimeError, "cannot subclass final class #{FriezaForthForm}", fn ->
-      class FriezaFifthForm < FriezaForthForm do
+    assert_raise RuntimeError, "cannot subclass final class #{FriezaFourthForm}", fn ->
+      class FriezaFifthForm < FriezaFourthForm do
       end
     end
 
-    purge [FriezaForthForm, FriezaFifthForm]
+    purge [FriezaFourthForm, FriezaFifthForm]
   end
 
   defp purge(module) when is_atom(module) do
