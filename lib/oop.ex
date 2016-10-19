@@ -35,6 +35,7 @@ defmodule OOP.Builder do
         def new(data \\ [], descendant? \\ false) do
           OOP.Builder.ensure_can_be_instantiated(unquote(class), descendant?, unquote(opts))
 
+
           object = :"#{unquote(class)}#{:erlang.unique_integer()}"
 
           defmodule object do
@@ -160,7 +161,8 @@ defmodule OOP.Builder do
       end
 
       def handle_call({:get, unquote(field)}, {pid, _ref}, data) do
-        if unquote(private?) and ! OOP.Registry.get(pid) in [class | @friends] do
+        classes = [class | @friends]
+        if unquote(private?) and ! OOP.Registry.get(pid) in classes do
           {:reply, {:error, :private}, data}
         else
           {:reply, {:ok, Map.get(data, unquote(field))}, data}
