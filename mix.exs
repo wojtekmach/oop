@@ -3,7 +3,7 @@ defmodule OOP.Mixfile do
 
   def project do
     [app: :oop,
-     version: "0.1.0",
+     version: "0.1.1",
      description: "OOP in Elixir!",
      package: package,
      elixir: "~> 1.0",
