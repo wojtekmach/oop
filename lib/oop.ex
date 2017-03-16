@@ -102,7 +102,7 @@ defmodule OOP.Builder do
     #       if so, we let it leak: `var!(this) = data`.
     #       We do this so that we don't get the "unused variable this" warning when
     #       we don't use `this`.
-    using_this? = String.match?(Macro.to_string(expr), ~r"this\.")
+    using_this? = String.match?(Macro.to_string(expr), ~r"\bthis\.")
 
     {method, args} = Macro.decompose_call(call)
 
