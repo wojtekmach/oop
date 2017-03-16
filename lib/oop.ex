@@ -161,7 +161,7 @@ defmodule OOP.Builder do
       end
 
       def handle_call({:get, unquote(field)}, {pid, _ref}, data) do
-        classes = [class | @friends]
+        classes = [class() | @friends]
         if unquote(private?) and ! OOP.Registry.get(pid) in classes do
           {:reply, {:error, :private}, data}
         else
