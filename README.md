@@ -80,19 +80,19 @@ See more usage in the [test suite](test/oop_test.exs).
 
   1. Add `oop` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:oop, "~> 0.1.0"}]
-    end
-    ```
+```elixir
+def deps do
+  [{:oop, "~> 0.1.0"}]
+end
+```
 
   2. Ensure `oop` is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:oop]]
-    end
-    ```
+```elixir
+def application do
+  [applications: [:oop]]
+end
+```
 
 ## License
 
