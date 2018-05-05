@@ -24,9 +24,7 @@ defmodule OOP.Builder do
   def create_class(class, superclasses, block, opts) do
     quote do
       defmodule unquote(class) do
-        superclasses
-        |> unquote
-        |> OOP.Builder.ensure_can_be_subclassed
+        OOP.Builder.ensure_can_be_subclassed(unquote(superclasses))
 
         @final Keyword.get(unquote(opts), :final, false)
 
