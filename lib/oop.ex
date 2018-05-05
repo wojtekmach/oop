@@ -4,11 +4,11 @@ defmodule OOP.Registry do
   end
 
   def register(pid, class) do
-    Agent.update(__MODULE__, fn map -> Map.put(map, pid, class) end)
+    Agent.update(__MODULE__, Map.put(&1, pid, class) end)
   end
 
   def get(pid) do
-    Agent.get(__MODULE__, fn map -> Map.get(map, pid, nil) end)
+    Agent.get(__MODULE__, Map.get(&1, pid, nil) end)
   end
 end
 
@@ -24,7 +24,9 @@ defmodule OOP.Builder do
   def create_class(class, superclasses, block, opts) do
     quote do
       defmodule unquote(class) do
-        OOP.Builder.ensure_can_be_subclassed(unquote(superclasses))
+        superclasses
+        |> unquote
+        |> OOP.Builder.ensure_can_be_subclassed
 
         @final Keyword.get(unquote(opts), :final, false)
 
