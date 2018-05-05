@@ -4,11 +4,11 @@ defmodule OOP.Registry do
   end
 
   def register(pid, class) do
-    Agent.update(__MODULE__, Map.put(&1, pid, class) end)
+    Agent.update(__MODULE__, Map.put(&1, pid, class))
   end
 
   def get(pid) do
-    Agent.get(__MODULE__, Map.get(&1, pid, nil) end)
+    Agent.get(__MODULE__, Map.get(&1, pid, nil))
   end
 end
 
