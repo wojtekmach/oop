@@ -1,4 +1,4 @@
-<h1 align="center"> <br><img src="logo/logotype_horizontal.png?raw=true" alt="Gplanner" width="312"> <br>
+<h1 align="center"> <br><img src="logo/logotype_horizontal.png?raw=true" alt="oop" width="256"> <br>
 
 # OOP
 
