@@ -1,3 +1,5 @@
+<h1 align="center"> <br><img src="logo/logotype_horizontal.png?raw=true" alt="Gplanner" width="312"> <br>
+
 # OOP
 
 [![Build Status](https://travis-ci.org/wojtekmach/oop.svg?branch=master)](https://travis-ci.org/wojtekmach/oop)
