@@ -6,7 +6,7 @@
 
 Are you tired of all of that modules, processes and functions nonsense? Do you want to just use classes, objects and methods? If so, use OOP [1] library in Elixir [2]!
 
-[1] Actually, according to Alan Key, the inventor of OOP, "objects" is the lesser idea; the big idea is "messaging". In that sense, I can't agree more with Joe Armstrong's quote that Erlang is "possibly the only object-oriented language".
+[1] Actually, according to Alan Kay, the inventor of OOP, "objects" is the lesser idea; the big idea is "messaging". In that sense, I can't agree more with Joe Armstrong's quote that Erlang is "possibly the only object-oriented language".
 
 [2] Please don't. You've been warned.
 
